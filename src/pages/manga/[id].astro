@@ -1,0 +1,89 @@
+---
+import { getCollection } from "astro:content";
+import { SHOW_BUY_BUTTON } from "astro:env/server";
+import Layout from "../../layouts/Layout.astro";
+import MangaScore from "../../components/MangaScore.astro";
+import Description from "../../components/Description.astro";
+
+export async function getStaticPaths() {
+  const mangas = await getCollection("mangas");
+
+  return mangas.map((manga) => ({
+    params: { id: manga.slug },
+    props: { manga },
+  }));
+}
+
+const { manga } = Astro.props;
+const { data, slug } = manga;
+const { title, author, img, genero, description, read } = data;
+
+export const prerender = true;
+---
+
+<Layout title={`${title} - MangaVerse`}>
+  <div class="flex gap-12">
+    <aside class="flex flex-col items-center gap-4">
+      <a href="/" class="hover:underline opacity-70"> ⬅️ Volver atrás</a>
+      <img
+        transition:name={`img-${slug}`}
+        class="rounded w-72 h-auto"
+        src={`/${img}`}
+        alt={title}
+      />
+      <MangaScore server:defer id={slug}>
+        <span slot="fallback" class="text-xs opacity-70"
+          >Cargando Puntuación ....
+        </span>
+      </MangaScore>
+    </aside>
+
+    <main class="max-w-3xl">
+      <h1 transition:name={`title-${slug}`} class="text-4xl font-bold mb-4">
+        {title}
+      </h1>
+      <Description description={description} server:defer />
+    </main>
+  </div>
+
+  <section class="flex justify-around mt-10">
+    {
+      SHOW_BUY_BUTTON && (
+        <a
+          href={read.english}
+          title="Leer Ingles"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-balance inline-flex gap-2 items-center bg-blue-900 hover:bg-blue-950 active:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg border border-blue-950 transition duration-200 ease-in-out hover:scale-105 justify-center text-center"
+        >
+          Read on mangafire
+          <img
+            src="/logo.png"
+            class=" w-15 h-9 object-fill
+            "
+            alt=""
+          />
+        </a>
+      )
+    }
+    {
+      SHOW_BUY_BUTTON && (
+        <a
+          href={read.english}
+          title="Leer Ingles"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-balance inline-flex gap-2 items-center bg-tmg hover:bg-tmg active:bg-tmg text-white font-bold py-2 px-4 rounded-lg border border-tmg transition duration-200 ease-in-out hover:scale-105 justify-center text-center"
+        >
+          Leer en TUMANGAONLINE
+          <img
+            src="/tmg.png"
+            class=" w-15 h-9 object-fill
+            "
+            alt=""
+          />
+        </a>
+      )
+    }
+  </section>
+</Layout>

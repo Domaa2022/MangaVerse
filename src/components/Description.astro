@@ -1,0 +1,11 @@
+---
+const ESPAÑOL = "ES";
+const { description } = Astro.props;
+const country = Astro.request.headers.get("X-Vercel-IP-Country") ?? "ES";
+const storeCountry =
+  country === ESPAÑOL ? description.spanish : description.english;
+---
+
+<div class="prose prose-invert">
+  {storeCountry}
+</div>
